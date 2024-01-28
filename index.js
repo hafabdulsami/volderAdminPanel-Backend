@@ -6,6 +6,10 @@ const app = express();
 
 app.use(bodyParser.json());
 
+// Import Routes
+const CategoryRoutes = require('./routes/CategoryRoute');
+
+app.use('/api', CategoryRoutes);
 
 
 app.listen(3000, () => {
