@@ -4,7 +4,6 @@ dotenv.config();
 
 // Create a new category
 async function createCategory(req, res) {
-  
   try {
     const newCategory = await Category.create(req.body);
 
@@ -29,4 +28,33 @@ async function createCategory(req, res) {
   }
 }
 
-module.exports = { createCategory };
+async function getCategory(req, res) {
+  const { id } = req.query;
+
+  if (id) {
+    try {
+      const category = await Category.findByPk(id);
+      if (category) {
+        return res.status(200).json({ category });
+      } else {
+        return res.status(404).json({ error: "Category not found" });
+      }
+    } catch (error) {
+      console.error("Error during category retrieval:", error);
+      return res
+        .status(500)
+        .json({ error: "An error occurred during category retrieval" });
+    }
+  }
+
+  try {
+    const categoryList = await Category.findAll();
+    return res.status(200).json({ categoryList });
+  } catch (error) {
+    console.error("Error during category list retrieval:", error);
+    return res
+      .status(500)
+      .json({ error: "An error occurred during category list retrieval" });
+  }
+}
+module.exports = { createCategory, getCategory };
