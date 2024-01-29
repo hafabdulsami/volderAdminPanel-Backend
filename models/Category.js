@@ -14,9 +14,12 @@ const Category = sequelize.define("Category", {
     allowNull: false,
     unique: true,
   },
-
-  Images: {
+  ImageName: {
     type: DataTypes.STRING,
+    allowNull: false,
+  },
+  Images: {
+    type: DataTypes.BLOB("medium"),
     allowNull: false,
   },
 });
