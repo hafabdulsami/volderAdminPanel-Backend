@@ -1,5 +1,6 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../utils/database.js");
+const Image = require("./Images"); // Assuming your Images file is named Images.js
 
 const Category = sequelize.define("Category", {
   id: {
@@ -8,23 +9,14 @@ const Category = sequelize.define("Category", {
     primaryKey: true,
     defaultValue: DataTypes.UUIDV4,
   },
-
-  Name: {
+  name: {
     type: DataTypes.STRING,
     allowNull: false,
     unique: true,
   },
-  ImageName: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  Images: {
-    type: DataTypes.BLOB("medium"),
-    allowNull: false,
-  },
 });
-
-// Create the table if it doesn't exist
+// Define the association
+Category.hasMany(Image, { foreignKey: "categoryId" });
 Category.sync();
 
 module.exports = Category;
