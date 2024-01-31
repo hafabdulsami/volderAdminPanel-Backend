@@ -35,12 +35,32 @@ const createUser = async (req, res) => {
   }
 };
 
+const Edituser = async (req, res) => {
+  const { id } = req.body;
+  if (!id) { 
+    res.status(500).json({ message: "The user doesnot exist" });
+  }
+  try {
+    const hashPassword = await generateHash(req.body.password);
+    const updateUser = await User.update(
+      { ...req.body, password: hashPassword },
+      { where: { id: id } }
+    );
+    if (updateUser) {
+      res.status(201).json({ message: "User updated successfully" });
+    } else {
+      res.status(500).json({ message: "User is not updated" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "An error occur during this operation" });
+  }
+};
 const userList = async (req, res) => {
   try {
-    const { _id } = req.query;
+    const { id } = req.query;
     console.log(req.query);
-    if (_id) {
-      const user = await User.findByPk(_id);
+    if (id) {
+      const user = await User.findByPk(id);
       return res.status(200).json({ user });
     } else {
       const userList = await User.findAll();
@@ -66,4 +86,4 @@ const generateHash = async (text) => {
     });
 };
 
-module.exports = { createUser,userList };
+module.exports = { createUser, userList, Edituser };
