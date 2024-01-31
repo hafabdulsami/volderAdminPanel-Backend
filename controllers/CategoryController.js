@@ -31,6 +31,47 @@ async function createCategory(req, res) {
       .json({ error: "An error occurred during category creation" });
   }
 }
+
+async function editCategory(req, res) {
+  const { id, name, images } = req.body;
+  //console.log(req.body);
+  if (id) {
+    try {
+      const category = await Category.findByPk(id);
+
+      if (!category) {
+        return res.status(404).json({ error: "Category not found." });
+      }
+      if (name) {
+        category.name = name;
+        await category.save();
+      }
+      const existingImage = await Images.update(
+        {
+          ...images[0],
+          categoryId: id,
+        },
+        { where: { categoryId: id } }
+      );
+      //const existingImage = await Images.findOne({ where: { categoryId: id } });
+      //Object.assign(existingImage, images);
+      //await existingImage.save();
+      console.log(existingImage);
+
+      // You can perform updates or any other logic here
+
+      return res
+        .status(200)
+        .json({ message: "Category and images update successfully." });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "Internal server error." });
+    }
+  } else {
+    return res.status(500).json({ error: "id is empty" });
+  }
+}
+
 async function getCategory(req, res) {
   const { id } = req.query;
 
@@ -78,4 +119,4 @@ async function getCategory(req, res) {
   }
 }
 
-module.exports = { createCategory, getCategory };
+module.exports = { createCategory, getCategory, editCategory };
