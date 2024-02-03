@@ -7,8 +7,6 @@ const createUser = async (req, res) => {
   try {
     const { name, password, phonenumber } = req.body;
     const hashPassword = await generateHash(password);
-    console.log(hashPassword);
-    console.log(password);
     const newUser = await User.create({
       name,
       password: hashPassword,
