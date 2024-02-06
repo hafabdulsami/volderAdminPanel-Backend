@@ -1,4 +1,3 @@
-const Category = require("../models/Category");
 const dotenv = require("dotenv");
 const Images = require("../models/Images");
 const Product = require("../models/Product");
@@ -96,7 +95,7 @@ async function getProduct(req, res) {
     //  })),
     //}));
 
-    return res.status(200).json({ categoryList: productList });
+    return res.status(200).json({ productList: productList });
   } catch (error) {
     console.error("Error during category list retrieval:", error);
     return res

@@ -15,9 +15,6 @@ const Category = sequelize.define("Category", {
     unique: true,
   },
 });
-// Define the association
-Category.hasMany(Image, { foreignKey: "categoryId" });
-Category.hasMany(Product, { foreignKey: "categoryId" });
 
 Category.sync();
 

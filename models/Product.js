@@ -33,12 +33,10 @@ const Product = sequelize.define("Product", {
 });
 
 // Define the association
-Product.associate = (models) => {
-  Product.belongsTo(Category, { foreignKey: "categoryId" });
-  Product.hasMany(Image, { foreignKey: "productId" });
-};
+  Product.belongsTo(Category, { foreignKey: "categoryId", as:"product_category"});
 
 // Synchronize the model with the database
+Category.sync();
 Product.sync();
 
 module.exports = Product;
