@@ -1,5 +1,5 @@
 const dotenv = require("dotenv");
-const Images = require("../models/Images");
+const Productimage = require("../models/Productimage");
 const Product = require("../models/Product");
 const { Sequelize } = require("sequelize");
 dotenv.config();
@@ -34,7 +34,7 @@ async function createProduct(req, res) {
     const imageRecords = await Promise.all(
       images.map(async (image) => {
         // Step 3: Create a new image record and associate it with the product
-        return await Images.create({
+        return await Productimage.create({
           ...image,
           productId: newProduct.id,
         });
@@ -61,15 +61,18 @@ async function getProduct(req, res) {
   const { id } = req.query;
 
   if (id) {
+    console.log(id);
+    console.log("LLLLLLL");
     try {
-      const product = await Product.findByPk(id, { include: Images });
+      const product = await Product.findByPk(id, { include: Productimage });
+      console.log(product)
       if (product) {
         // Include the category data in the response
         return res.status(200).json({
           product,
         });
       } else {
-        return res.status(404).json({ message: "Category not found" });
+        return res.status(404).json({ message: "Product not found" });
       }
     } catch (error) {
       console.error("Error during category retrieval:", error);
@@ -80,7 +83,7 @@ async function getProduct(req, res) {
   }
 
   try {
-    const productList = await Product.findAll({ include: Images });
+    const productList = await Product.findAll({ include: Productimage });
     //const formattedCategoryList = categoryList.map(category => ({
     //  id: category.id,
     //  Name: category.name,

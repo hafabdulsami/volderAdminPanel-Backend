@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../utils/database.js");
-const Image = require("./Images"); // Assuming your Images file is named Images.js
-const Product = require("./Product")
+const Categoryimage = require("./Categoryimage.js");
+const Product = require("./Product.js");
 const Category = sequelize.define("Category", {
   id: {
     type: DataTypes.UUID,
@@ -15,7 +15,7 @@ const Category = sequelize.define("Category", {
     unique: true,
   },
 });
-
+Category.hasMany(Categoryimage ,{ foreignKey: 'categoryid'});
 Category.sync();
 
 module.exports = Category;

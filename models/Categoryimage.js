@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../utils/database.js");
-const Productimage = require("../models/Productimage.js");
-const Product = sequelize.define("Product", {
+const Category = require("./Category.js");
+const Categoryimage = sequelize.define("Categoryimage", {
   id: {
     type: DataTypes.UUID,
     allowNull: false,
@@ -12,29 +12,35 @@ const Product = sequelize.define("Product", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  description: {
+  path: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  featured: {
-    type: DataTypes.STRING,
+  preview: {
+    type: DataTypes.BLOB("medium"),
+    allowNull: false,
+    get() {
+      return this.getDataValue("preview").toString(); // or whatever encoding is right
+    },
+  },
+  size: {
+    type: DataTypes.INTEGER,
     allowNull: false,
   },
-  specification: {
+  type: {
     type: DataTypes.STRING,
     allowNull: false,
   },
   categoryId: {
     // Foreign key for Category
     type: DataTypes.UUID,
-    allowNull: false,
-  },
+    allowNull: true,
+  }
 });
 
-Product.hasMany(Productimage, {
-  foreignKey: "productId", // References the productId field in Productimage
-  // Specifies the name of the association
-});
-Product.sync();
 
-module.exports = Product;
+
+// Synchronize the model with the database
+Categoryimage.sync();
+
+module.exports = Categoryimage;

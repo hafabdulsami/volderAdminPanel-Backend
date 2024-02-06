@@ -1,8 +1,6 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../utils/database.js");
-const Category = require("./Category.js");
-const Product = require("./Product");
-const Image = sequelize.define("Image", {
+const Productimage = sequelize.define("Productimage", {
   id: {
     type: DataTypes.UUID,
     allowNull: false,
@@ -32,11 +30,6 @@ const Image = sequelize.define("Image", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  categoryId: {
-    // Foreign key for Category
-    type: DataTypes.UUID,
-    allowNull: true,
-  },
   productId: {
     // Foreign key for Category
     type: DataTypes.UUID,
@@ -45,13 +38,9 @@ const Image = sequelize.define("Image", {
 });
 
 // Define the association
-Image.belongsTo(Category, { foreignKey: "categoryId",as:"category" });
-Image.belongsTo(Product, { foreignKey: "productId", as:"product" });
 
 
 // Synchronize the model with the database
-Category.sync()
-Product.sync()
-Image.sync();
+Productimage.sync();
 
-module.exports = Image;
+module.exports = Productimage;
