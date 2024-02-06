@@ -13,7 +13,7 @@ const Product = sequelize.define("Product", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  describtion: {
+  description: {
     type: DataTypes.STRING,
     allowNull: false,
   },
@@ -21,8 +21,8 @@ const Product = sequelize.define("Product", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  specifiction: {
-    type: DataTypes.INTEGER,
+  specification: {
+    type: DataTypes.STRING,
     allowNull: false,
   },
   categoryId: {

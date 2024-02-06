@@ -1,6 +1,8 @@
 const Category = require("../models/Category");
 const dotenv = require("dotenv");
 const Images = require("../models/Images");
+const Product = require("../models/Product");
+const { Sequelize } = require("sequelize");
 dotenv.config();
 
 async function createProduct(req, res) {
@@ -8,6 +10,18 @@ async function createProduct(req, res) {
     const { name, description, featured, specification, categoryId, images } =
       req.body;
 
+    const existingProduct = await Product.findOne({
+      where: {
+        name: {
+          [Sequelize.Op.eq]: name,
+        },
+      },
+    });
+    if (existingProduct) {
+      return res
+        .status(400)
+        .json({ message: "Product with this name already exists" });
+    }
     // Step 1: Create a new product
     const newProduct = await Product.create({
       name,
@@ -21,7 +35,7 @@ async function createProduct(req, res) {
     const imageRecords = await Promise.all(
       images.map(async (image) => {
         // Step 3: Create a new image record and associate it with the product
-        return await Image.create({
+        return await Images.create({
           ...image,
           productId: newProduct.id,
         });
@@ -34,13 +48,13 @@ async function createProduct(req, res) {
         .status(201)
         .json({ message: "Product and images created successfully" });
     } else {
-      res.status(500).json({ error: "Product creation failed" });
+      res.status(500).json({ message: "Product creation failed" });
     }
   } catch (error) {
     console.error("Error during product creation:", error);
     res
       .status(500)
-      .json({ error: "An error occurred during product creation" });
+      .json({ message: "An error occurred during product creation" });
   }
 }
 
