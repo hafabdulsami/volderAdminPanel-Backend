@@ -58,4 +58,50 @@ async function createProduct(req, res) {
   }
 }
 
-module.exports = { createProduct };
+async function getProduct(req, res) {
+  const { id } = req.query;
+
+  if (id) {
+    try {
+      const product = await Product.findByPk(id, { include: Images });
+      if (product) {
+        // Include the category data in the response
+        return res.status(200).json({
+          product,
+        });
+      } else {
+        return res.status(404).json({ message: "Category not found" });
+      }
+    } catch (error) {
+      console.error("Error during category retrieval:", error);
+      return res
+        .status(500)
+        .json({ message: "An error occurred during category retrieval" });
+    }
+  }
+
+  try {
+    const productList = await Product.findAll({ include: Images });
+    //const formattedCategoryList = categoryList.map(category => ({
+    //  id: category.id,
+    //  Name: category.name,
+    //  // Add other properties as needed
+    //  Images: category.Images.map(image => ({
+    //    id: image.id,
+    //    name: image.name,
+    //    path: image.path,
+    //    preview: image.preview,
+    //    size: image.size,
+    //    type: image.type,
+    //  })),
+    //}));
+
+    return res.status(200).json({ categoryList: productList });
+  } catch (error) {
+    console.error("Error during category list retrieval:", error);
+    return res
+      .status(500)
+      .json({ message: "An error occurred during category list retrieval" });
+  }
+}
+module.exports = { createProduct, getProduct };
