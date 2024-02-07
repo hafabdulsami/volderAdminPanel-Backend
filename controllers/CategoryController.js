@@ -5,7 +5,6 @@ dotenv.config();
 
 // Create a new category
 async function createCategory(req, res) {
-  console.log(req.body);
   try {
     const { name, images } = req.body;
 

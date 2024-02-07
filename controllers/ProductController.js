@@ -64,7 +64,6 @@ async function getProduct(req, res) {
   if (id) {
     try {
       const product = await Product.findByPk(id, { include: Productimage });
-      console.log(product);
       if (product) {
         // Include the category data in the response
         return res.status(200).json({

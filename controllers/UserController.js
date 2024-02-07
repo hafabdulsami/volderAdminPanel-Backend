@@ -56,7 +56,6 @@ const Edituser = async (req, res) => {
 const userList = async (req, res) => {
   try {
     const { id } = req.query;
-    console.log(req.query);
     if (id) {
       const user = await User.findByPk(id);
       return res.status(200).json({ user });
