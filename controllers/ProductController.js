@@ -2,6 +2,7 @@ const dotenv = require("dotenv");
 const Productimage = require("../models/Productimage");
 const Product = require("../models/Product");
 const { Sequelize } = require("sequelize");
+const sequelize = require("../utils/database.js");
 dotenv.config();
 
 async function createProduct(req, res) {
@@ -61,11 +62,9 @@ async function getProduct(req, res) {
   const { id } = req.query;
 
   if (id) {
-    console.log(id);
-    console.log("LLLLLLL");
     try {
       const product = await Product.findByPk(id, { include: Productimage });
-      console.log(product)
+      console.log(product);
       if (product) {
         // Include the category data in the response
         return res.status(200).json({
@@ -106,4 +105,52 @@ async function getProduct(req, res) {
       .json({ message: "An error occurred during category list retrieval" });
   }
 }
-module.exports = { createProduct, getProduct };
+
+async function editProduct(req, res) {
+  const { id, images } = req.body;
+
+  if (!id) {
+    return res.status(400).json({ message: "id is empty" });
+  }
+
+  if (!images || !Array.isArray(images)) {
+    return res
+      .status(400)
+      .json({ message: "images array is missing or invalid" });
+  }
+
+  try {
+    await sequelize.transaction(async (t) => {
+      // Update Product
+      const [updatedRows] = await Product.update(req.body, {
+        where: { id },
+        transaction: t,
+      });
+
+      // Check if the Product was updated successfully
+      if (updatedRows === 0) {
+        throw new Error("Product not found or not updated");
+      }
+
+      // Delete existing Productimage records
+      await Productimage.destroy({ where: { productId: id }, transaction: t });
+
+      // Create new Productimage records
+      const productImages = images.map((image) => ({
+        productId: id,
+        ...image,
+      }));
+
+      await Productimage.bulkCreate(productImages, { transaction: t });
+    });
+
+    return res
+      .status(200)
+      .json({ message: "Product and images updated successfully." });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+module.exports = { createProduct, getProduct, editProduct };
