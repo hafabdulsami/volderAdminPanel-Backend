@@ -16,12 +16,11 @@ async function createCategory(req, res) {
     const t = await sequelize.transaction();
 
     try {
-      console.log(req.files);
       // Create a new category
       const newCategory = await Category.create({ name }, { transaction: t });
 
       // Create a new category image record
-      const imageRecord = await Categoryimage.create({
+       await Categoryimage.create({
         name: originalname,
         path: path,
         preview: process.env.Images_location + originalname,
