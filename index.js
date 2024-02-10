@@ -4,10 +4,10 @@ const cors = require("cors");
 
 const app = express();
 
-app.use(cors());
-
-// Increase payload size limit for JSON and URL-encoded data
 app.use(bodyParser.json({ limit: "35mb" }));
+app.use(cors());
+app.use(express.static("images"));
+// Increase payload size limit for JSON and URL-encoded data
 // Import Routes
 const CategoryRoutes = require("./routes/CategoryRoute");
 const UserRoutes = require("./routes/UserRoute");

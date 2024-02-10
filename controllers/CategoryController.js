@@ -1,32 +1,48 @@
 const Category = require("../models/Category");
 const dotenv = require("dotenv");
 const Categoryimage = require("../models/Categoryimage");
+const sequelize = require("../utils/database.js");
 dotenv.config();
 
 // Create a new category
 async function createCategory(req, res) {
   try {
-    const { name, images } = req.body;
+    const { originalname, path, size, mimetype } = req.files[0];
+    const { name } = req.body;
+    if (!req.files) {
+      return res.status(400).json({ message: "Image is not uploaded" });
+    }
 
-    const newCategory = await Category.create({ name });
+    const t = await sequelize.transaction();
 
-    const imageRecord = await Categoryimage.create({
-      ...images[0],
-      categoryId: newCategory.id,
-    });
+    try {
+      console.log(req.files);
+      // Create a new category
+      const newCategory = await Category.create({ name }, { transaction: t });
 
-    if (newCategory && imageRecord) {
-      res
-        .status(201)
-        .json({ message: "Category and images created successfully" });
-    } else {
-      res.status(500).json({ message: "Category creation failed" });
+      // Create a new category image record
+      const imageRecord = await Categoryimage.create({
+        name: originalname,
+        path: path,
+        preview: process.env.Images_location + originalname,
+        size: size,
+        type: mimetype,
+        categoryId: newCategory.id,
+      }, { transaction: t });
+
+      // Commit the transaction if both operations are successful
+      await t.commit();
+
+      return res.status(201).json({ message: "Category and images created successfully" });
+    } catch (error) {
+      // Rollback the transaction if there's an error
+      await t.rollback();
+      console.error("Error during category creation:", error);
+      return res.status(500).json({ message: "An error occurred during category creation" });
     }
   } catch (error) {
     console.error("Error during category creation:", error);
-    res
-      .status(500)
-      .json({ message: "An error occurred during category creation" });
+    return res.status(500).json({ message: "An error occurred during category creation" });
   }
 }
 

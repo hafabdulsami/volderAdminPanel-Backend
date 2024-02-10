@@ -17,11 +17,8 @@ const Categoryimage = sequelize.define("Categoryimage", {
     allowNull: false,
   },
   preview: {
-    type: DataTypes.BLOB("medium"),
+    type: DataTypes.STRING,
     allowNull: false,
-    get() {
-      return this.getDataValue("preview").toString(); // or whatever encoding is right
-    },
   },
   size: {
     type: DataTypes.INTEGER,
