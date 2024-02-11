@@ -2,6 +2,7 @@ const Category = require("../models/Category");
 const dotenv = require("dotenv");
 const Categoryimage = require("../models/Categoryimage");
 const sequelize = require("../utils/database.js");
+const fs = require("fs").promises;
 dotenv.config();
 
 // Create a new category
@@ -20,34 +21,42 @@ async function createCategory(req, res) {
       const newCategory = await Category.create({ name }, { transaction: t });
 
       // Create a new category image record
-       await Categoryimage.create({
-        name: originalname,
-        path: path,
-        preview: process.env.Images_location + originalname,
-        size: size,
-        type: mimetype,
-        categoryId: newCategory.id,
-      }, { transaction: t });
+      await Categoryimage.create(
+        {
+          name: originalname,
+          path: path,
+          preview: process.env.Images_location + originalname,
+          size: size,
+          type: mimetype,
+          categoryId: newCategory.id,
+        },
+        { transaction: t }
+      );
 
       // Commit the transaction if both operations are successful
       await t.commit();
 
-      return res.status(201).json({ message: "Category and images created successfully" });
+      return res
+        .status(201)
+        .json({ message: "Category and images created successfully" });
     } catch (error) {
       // Rollback the transaction if there's an error
       await t.rollback();
       console.error("Error during category creation:", error);
-      return res.status(500).json({ message: "An error occurred during category creation" });
+      return res
+        .status(500)
+        .json({ message: "An error occurred during category creation" });
     }
   } catch (error) {
     console.error("Error during category creation:", error);
-    return res.status(500).json({ message: "An error occurred during category creation" });
+    return res
+      .status(500)
+      .json({ message: "An error occurred during category creation" });
   }
 }
 
 async function editCategory(req, res) {
   const { id, name, images } = req.body;
-
   if (id) {
     try {
       const category = await Category.findByPk(id);
@@ -56,24 +65,36 @@ async function editCategory(req, res) {
         return res.status(404).json({ message: "Category not found." });
       }
 
-      if (name) {
-        category.name = name;
-        await category.save();
-      }
-
-      const existingImage = await Categoryimage.findOne({
-        where: { categoryId: id },
-      });
-
-      if (existingImage) {
-        await existingImage.update({ ...images[0] });
-      } else {
-        await Categoryimage.create({
-          ...images[0],
-          categoryId: id,
+      category.name = name;
+      await category.save();
+      if (req.files?.length ? true : false) {
+        const existingImage = await Categoryimage.findOne({
+          where: { categoryId: id },
         });
+        if (existingImage && existingImage.path) {
+          try {
+            await fs.unlink(existingImage.path);
+            console.log("Previous file deleted successfully.");
+          } catch (deleteError) {
+            console.error("Error deleting previous file:", deleteError);
+          }
+        }
+        if (existingImage) {
+          await existingImage.update({
+            name: req.files[0].originalname,
+            path: req.files[0].path,
+            preview: process.env.Images_location + req.files[0].originalname,
+            size: req.files[0].size,
+            type: req.files[0].mimetype,
+            categoryId: id,
+          });
+        } else {
+          await Categoryimage.create({
+            ...images[0],
+            categoryId: id,
+          });
+        }
       }
-
       return res
         .status(200)
         .json({ message: "Category and images updated successfully." });
