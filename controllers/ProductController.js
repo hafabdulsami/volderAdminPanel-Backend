@@ -33,10 +33,14 @@ async function createProduct(req, res) {
 
     // Step 2: Associate the product with images
     const imageRecords = await Promise.all(
-      images.map(async (image) => {
+      req.files.map(async (image) => {
         // Step 3: Create a new image record and associate it with the product
         return await Productimage.create({
-          ...image,
+          name: image.originalname,
+            path: image.path,
+            preview: process.env.Images_location + image.originalname,
+            size: image.size,
+            type: image.mimetype,
           productId: newProduct.id,
         });
       })
