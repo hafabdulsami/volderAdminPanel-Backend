@@ -3,6 +3,7 @@ const Productimage = require("../models/Productimage");
 const Product = require("../models/Product");
 const { Sequelize } = require("sequelize");
 const sequelize = require("../utils/database.js");
+const fs = require("fs").promises;
 dotenv.config();
 
 async function createProduct(req, res) {
@@ -30,17 +31,16 @@ async function createProduct(req, res) {
       specification,
       categoryId,
     });
-
     // Step 2: Associate the product with images
     const imageRecords = await Promise.all(
       req.files.map(async (image) => {
         // Step 3: Create a new image record and associate it with the product
         return await Productimage.create({
           name: image.originalname,
-            path: image.path,
-            preview: process.env.Images_location + image.originalname,
-            size: image.size,
-            type: image.mimetype,
+          path: image.path,
+          preview: process.env.Images_location + image.filename,
+          size: image.size,
+          type: image.mimetype,
           productId: newProduct.id,
         });
       })
@@ -110,18 +110,11 @@ async function getProduct(req, res) {
 }
 
 async function editProduct(req, res) {
-  const { id, images } = req.body;
+  const { id } = req.body;
 
   if (!id) {
     return res.status(400).json({ message: "id is empty" });
   }
-
-  if (!images || !Array.isArray(images)) {
-    return res
-      .status(400)
-      .json({ message: "images array is missing or invalid" });
-  }
-
   try {
     await sequelize.transaction(async (t) => {
       // Update Product
@@ -136,15 +129,46 @@ async function editProduct(req, res) {
       }
 
       // Delete existing Productimage records
-      await Productimage.destroy({ where: { productId: id }, transaction: t });
+      if (req.files?.length ? true : false) {
+        console.log("1");
 
-      // Create new Productimage records
-      const productImages = images.map((image) => ({
-        productId: id,
-        ...image,
-      }));
+        // Define productImages here
+        const productImages = await Productimage.findAll({
+          where: { productId: id },
+        });
 
-      await Productimage.bulkCreate(productImages, { transaction: t });
+        console.log("1");
+        // Delete existing images from the filesystem
+        await Promise.all(
+          productImages.map(async (image) => {
+            try {
+              await fs.unlink(image.path);
+            } catch (error) {
+              console.error(`Error deleting image file: ${image.path}`);
+            }
+          })
+        );
+
+        console.log("1");
+        await Productimage.destroy({
+          where: { productId: id },
+          transaction: t,
+        });
+
+        // Create new Productimage records
+        const newProductImages = await Promise.all(
+          req.files.map((image) => ({
+            productId: id,
+            name: image.originalname,
+            path: image.path,
+            preview: process.env.Images_location + image.filename,
+            size: image.size,
+            type: image.mimetype,
+          }))
+        );
+
+        await Productimage.bulkCreate(newProductImages, { transaction: t });
+      }
     });
 
     return res
@@ -155,5 +179,4 @@ async function editProduct(req, res) {
     return res.status(500).json({ message: "Internal server error" });
   }
 }
-
 module.exports = { createProduct, getProduct, editProduct };

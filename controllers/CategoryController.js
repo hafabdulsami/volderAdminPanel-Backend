@@ -8,7 +8,7 @@ dotenv.config();
 // Create a new category
 async function createCategory(req, res) {
   try {
-    const { originalname, path, size, mimetype } = req.files[0];
+    const {  path, size, mimetype,originalname,filename } = req.files[0];
     const { name } = req.body;
     if (!req.files) {
       return res.status(400).json({ message: "Image is not uploaded" });
@@ -25,7 +25,7 @@ async function createCategory(req, res) {
         {
           name: originalname,
           path: path,
-          preview: process.env.Images_location + originalname,
+          preview: process.env.Images_location + filename,
           size: size,
           type: mimetype,
           categoryId: newCategory.id,
@@ -56,7 +56,7 @@ async function createCategory(req, res) {
 }
 
 async function editCategory(req, res) {
-  const { id, name, images } = req.body;
+  const { id, name } = req.body;
   if (id) {
     try {
       const category = await Category.findByPk(id);
@@ -83,14 +83,9 @@ async function editCategory(req, res) {
           await existingImage.update({
             name: req.files[0].originalname,
             path: req.files[0].path,
-            preview: process.env.Images_location + req.files[0].originalname,
+            preview: process.env.Images_location + req.files[0].filename,
             size: req.files[0].size,
             type: req.files[0].mimetype,
-            categoryId: id,
-          });
-        } else {
-          await Categoryimage.create({
-            ...images[0],
             categoryId: id,
           });
         }
