@@ -110,10 +110,27 @@ async function getProduct(req, res) {
 }
 
 async function editProduct(req, res) {
-  const { id } = req.body;
+  const { id, removedItems } = req.body;
 
   if (!id) {
     return res.status(400).json({ message: "id is empty" });
+  }
+  const parsedArray = JSON.parse(removedItems[0]);
+  if (parsedArray.length > 0) {
+    parsedArray.map(async (image) => {
+     
+      try {
+        await fs.unlink(image.path);
+        await Productimage.destroy({
+          where: { id: image.id },
+        });
+      } catch (error) {
+        console.error(`Error deleting image file: ${image.path}`);
+      }
+    });
+    return res
+      .status(200)
+      .json({ message: "Product and images updated successfully." });
   }
   try {
     await sequelize.transaction(async (t) => {
@@ -130,14 +147,11 @@ async function editProduct(req, res) {
 
       // Delete existing Productimage records
       if (req.files?.length ? true : false) {
-        console.log("1");
-
         // Define productImages here
         const productImages = await Productimage.findAll({
           where: { productId: id },
         });
 
-        console.log("1");
         // Delete existing images from the filesystem
         await Promise.all(
           productImages.map(async (image) => {
@@ -149,7 +163,6 @@ async function editProduct(req, res) {
           })
         );
 
-        console.log("1");
         await Productimage.destroy({
           where: { productId: id },
           transaction: t,
