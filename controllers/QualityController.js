@@ -125,8 +125,8 @@ async function getQuality(req, res) {
   }
 
   try {
-    const QualityList = await Quality.findAll({ include: Qualityimage });
-    return res.status(200).json({ QualityList });
+    const qualityList = await Quality.findAll({ include: Qualityimage });
+    return res.status(200).json({ qualityList });
   } catch (error) {
     console.error("Error during Quality list retrieval:", error);
     return res
