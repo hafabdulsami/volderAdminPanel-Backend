@@ -30,7 +30,7 @@ const Qualityimage = sequelize.define("Qualityimage", {
   qualityId: {
     // Foreign key for Category
     type: DataTypes.UUID,
-    allowNull: true,
+    allowNull: false,
   }
 });
 

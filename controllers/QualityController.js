@@ -19,7 +19,7 @@ async function createQuality(req, res) {
     try {
       // Create a new Quality
       const newQuality = await Quality.create({ name,description }, { transaction: t });
-
+      
       // Create a new Quality image record
       await Qualityimage.create(
         {
@@ -28,7 +28,7 @@ async function createQuality(req, res) {
           preview: process.env.Images_location + filename,
           size: size,
           type: mimetype,
-          QualityId: newQuality.id,
+          qualityId: newQuality.id,
         },
         { transaction: t }
       );
@@ -108,10 +108,10 @@ async function getQuality(req, res) {
 
   if (id) {
     try {
-      const Quality = await Quality.findByPk(id, { include: Qualityimage });
-      if (Quality) {
+      const quality = await Quality.findByPk(id, { include: Qualityimage });
+      if (quality) {
         return res.status(200).json({
-          Quality,
+          quality,
         });
       } else {
         return res.status(404).json({ message: "Quality not found" });

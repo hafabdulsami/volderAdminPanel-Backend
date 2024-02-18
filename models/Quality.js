@@ -13,8 +13,13 @@ const Quality = sequelize.define("Quality", {
     allowNull: false,
     unique: true,
   },
+  description: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
+  },
 });
-Quality.hasMany(Qualityimage ,{ foreignKey: 'qualityId'});
+Quality.hasMany(Qualityimage ,{ foreignKey: 'QualityId'});
 Quality.sync();
 
 module.exports = Quality;
