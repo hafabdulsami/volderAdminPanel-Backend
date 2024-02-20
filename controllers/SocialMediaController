@@ -1,0 +1,54 @@
+const SocialMedia = require("../models/SocialMedia.js");
+const dotenv = require("dotenv");
+const sequelize = require("../utils/database.js");
+dotenv.config();
+
+// Create a new Social Media
+async function createSocialMedia(req, res) {
+  try {
+    const { path, size, mimetype, originalname, filename } = req.files[0];
+    const { name } = req.body;
+    if (!req.files) {
+      return res.status(400).json({ message: "Image is not uploaded" });
+    }
+
+    const t = await sequelize.transaction();
+
+    try {
+      // Create a new category
+      const newCategory = await Category.create({ name }, { transaction: t });
+
+      // Create a new category image record
+      await Categoryimage.create(
+        {
+          name: originalname,
+          path: path,
+          preview: process.env.Images_location + filename,
+          size: size,
+          type: mimetype,
+          categoryId: newCategory.id,
+        },
+        { transaction: t }
+      );
+
+      // Commit the transaction if both operations are successful
+      await t.commit();
+
+      return res
+        .status(201)
+        .json({ message: "Category and images created successfully" });
+    } catch (error) {
+      // Rollback the transaction if there's an error
+      await t.rollback();
+      console.error("Error during category creation:", error);
+      return res
+        .status(500)
+        .json({ message: "An error occurred during category creation" });
+    }
+  } catch (error) {
+    console.error("Error during category creation:", error);
+    return res
+      .status(500)
+      .json({ message: "An error occurred during category creation" });
+  }
+}
