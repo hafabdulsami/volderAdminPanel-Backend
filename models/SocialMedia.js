@@ -12,10 +12,13 @@ const SocialMedia = sequelize.define("SocialMedia", {
     allowNull: false,
     unique: true,
   },
+  value: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
   link: {
     type: DataTypes.STRING,
     allowNull: false,
-    unique: true,
   },
 });
 SocialMedia.sync();
