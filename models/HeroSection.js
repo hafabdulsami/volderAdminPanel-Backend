@@ -16,11 +16,8 @@ const HeroSection = sequelize.define("HeroSection", {
     allowNull: false,
   },
   preview: {
-    type: DataTypes.BLOB("medium"),
+    type: DataTypes.STRING,
     allowNull: false,
-    get() {
-      return this.getDataValue("preview").toString(); // or whatever encoding is right
-    },
   },
   size: {
     type: DataTypes.INTEGER,
@@ -30,15 +27,9 @@ const HeroSection = sequelize.define("HeroSection", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  productId: {
-    // Foreign key for Category
-    type: DataTypes.UUID,
-    allowNull: true,
-  },
 });
 
 // Define the association
-
 
 // Synchronize the model with the database
 HeroSection.sync();

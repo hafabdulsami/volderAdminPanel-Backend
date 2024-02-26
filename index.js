@@ -14,12 +14,14 @@ const UserRoutes = require("./routes/UserRoute");
 const ProductRoutes = require("./routes/ProductRoute");
 const QualityRoutes = require("./routes/QualityRoute");
 const SocialMediaRoute = require("./routes/SocialMediaRoute");
+const HeroSectionRoutes = require("./routes/HeroSectionRoutes");
 
 app.use("/api", CategoryRoutes);
 app.use("/api", UserRoutes);
 app.use("/api", ProductRoutes);
 app.use("/api", QualityRoutes);
 app.use("/api", SocialMediaRoute);
+app.use("/api", HeroSectionRoutes);
 
 app.listen(5000, () => {
   console.log("Server is running on port 5000");
