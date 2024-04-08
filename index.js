@@ -15,9 +15,10 @@ const ProductRoutes = require("./routes/ProductRoute");
 const QualityRoutes = require("./routes/QualityRoute");
 const SocialMediaRoute = require("./routes/SocialMediaRoute");
 const HeroSectionRoutes = require("./routes/HeroSectionRoutes");
-
+const VolderRoutes = require("./routes/VolderRoute");
 app.use("/api", CategoryRoutes);
 app.use("/api", UserRoutes);
+app.use("/api", VolderRoutes);
 app.use("/api", ProductRoutes);
 app.use("/api", QualityRoutes);
 app.use("/api", SocialMediaRoute);

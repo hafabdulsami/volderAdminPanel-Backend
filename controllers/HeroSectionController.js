@@ -1,6 +1,5 @@
 const dotenv = require("dotenv");
 const HeroSection = require("../models/HeroSection.js");
-const sequelize = require("../utils/database.js");
 const fs = require("fs").promises;
 dotenv.config();
 
@@ -12,7 +11,7 @@ async function createHeroSection(req, res) {
     }
 
     try {
-      // Create a new category image record
+      // Create a new image image record
       await HeroSection.create({
         name: originalname,
         path: path,
@@ -25,19 +24,19 @@ async function createHeroSection(req, res) {
 
       return res
         .status(201)
-        .json({ message: "Category and images created successfully" });
+        .json({ message: "images created successfully" });
     } catch (error) {
       // Rollback the transaction if there's an error
-      console.error("Error during category creation:", error);
+      console.error("Error during image creation:", error);
       return res
         .status(500)
-        .json({ message: "An error occurred during category creation" });
+        .json({ message: "An error occurred during image creation" });
     }
   } catch (error) {
-    console.error("Error during category creation:", error);
+    console.error("Error during image creation:", error);
     return res
       .status(500)
-      .json({ message: "An error occurred during category creation" });
+      .json({ message: "An error occurred during Image creation" });
   }
 }
 
@@ -52,13 +51,13 @@ async function getheroSection(req, res) {
           heroSection,
         });
       } else {
-        return res.status(404).json({ message: "Category not found" });
+        return res.status(404).json({ message: "image not found" });
       }
     } catch (error) {
-      console.error("Error during category retrieval:", error);
+      console.error("Error during image retrieval:", error);
       return res
         .status(500)
-        .json({ message: "An error occurred during category retrieval" });
+        .json({ message: "An error occurred during image retrieval" });
     }
   }
 
@@ -66,10 +65,10 @@ async function getheroSection(req, res) {
     const heroSectionList = await HeroSection.findAll();
     return res.status(200).json({ heroSectionList });
   } catch (error) {
-    console.error("Error during category list retrieval:", error);
+    console.error("Error during image list retrieval:", error);
     return res
       .status(500)
-      .json({ message: "An error occurred during category list retrieval" });
+      .json({ message: "An error occurred during image list retrieval" });
   }
 }
 
@@ -96,13 +95,13 @@ async function editHeroSection(req, res) {
             preview: process.env.Images_location + req.files[0].filename,
             size: req.files[0].size,
             type: req.files[0].mimetype,
-            categoryId: id,
+            imageId: id,
           });
         }
       }
       return res
         .status(200)
-        .json({ message: "Category and images updated successfully." });
+        .json({ message: "image and images updated successfully." });
     } catch (error) {
       console.error(error);
       return res.status(500).json({ message: "Internal server error." });
