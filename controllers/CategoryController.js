@@ -1,6 +1,6 @@
 const Category = require("../models/Category");
-const dotenv = require("dotenv");
 const Categoryimage = require("../models/Categoryimage");
+const dotenv = require("dotenv");
 const sequelize = require("../utils/database.js");
 const fs = require("fs").promises;
 dotenv.config();
